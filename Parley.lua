@@ -1,3 +1,7 @@
+local function Secret(v) -- chat hidden by the game (or faked by /cc secret)
+  if CopyCatFakeSecret and CopyCatFakeSecret > GetTime() then return true end
+  return issecretvalue ~= nil and issecretvalue(v) == true
+end
 -- Parley: instant-messenger whispers (character + Battle.net) with persistent history
 local ADDON = ...
 local P = CreateFrame("Frame")
@@ -493,6 +497,8 @@ local function Store(key, dir, text, display, bnID, guid)
 end
 
 local function HandleBN(dir, text, bnID)
+  if Secret(bnID) then return end
+  if Secret(text) then text = "(hidden by game)" end
   local tag = BNTagFromID(bnID)
   if not tag then return end
   Store("BN:" .. tag, dir, text, (tag:gsub("#.*", "")), bnID)
@@ -520,9 +526,9 @@ P:SetScript("OnEvent", function(_, ev, ...)
     P.MigrateKeys()
     BuildMinimap(); RefreshMinimap()
   elseif ev == "CHAT_MSG_WHISPER" then
-    local text, sender = ...; local k = Norm(sender); Store(k, "in", text, (sender:gsub("%-.*", "")), nil, (select(12, ...)))
+    local text, sender = ...; if Secret(sender) then return end; if Secret(text) then text = "(hidden by game)" end; local k = Norm(sender); Store(k, "in", text, (sender:gsub("%-.*", "")), nil, (select(12, ...)))
   elseif ev == "CHAT_MSG_WHISPER_INFORM" then
-    local text, target = ...; local k = Norm(target); Store(k, "out", text, (target:gsub("%-.*", "")), nil, (select(12, ...)))
+    local text, target = ...; if Secret(target) then return end; if Secret(text) then text = "(hidden by game)" end; local k = Norm(target); Store(k, "out", text, (target:gsub("%-.*", "")), nil, (select(12, ...)))
   elseif ev == "CHAT_MSG_BN_WHISPER" then
     HandleBN("in", (...), (select(13, ...)))
   elseif ev == "CHAT_MSG_BN_WHISPER_INFORM" then

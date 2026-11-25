@@ -2,7 +2,7 @@
 ## Title: Parley
 ## Notes: Instant-messenger style whisper windows with history that survives /reload and logout.
 ## Author: LankyFranky89
-## Version: 1.5.0
+## Version: 1.5.2
 ## SavedVariables: ParleyDB
 
 Parley.lua
